@@ -1,0 +1,193 @@
+import { useState } from "react";
+import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import TeamCard from "@/components/TeamCard";
+import DriverCard from "@/components/DriverCard";
+import CarCard from "@/components/CarCard";
+import Standings from "@/components/Standings";
+import Schedule from "@/components/Schedule";
+import LatestRace from "@/components/LatestRace";
+import { Card } from "@/components/ui/card";
+import { teams, drivers, cars, rules } from "@/data/f1Data";
+import { ExternalLink } from "lucide-react";
+
+const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query.toLowerCase());
+    if (query) {
+      const teamsSection = document.getElementById("teams");
+      if (teamsSection) {
+        teamsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  const filteredTeams = teams.filter((team) =>
+    team.name.toLowerCase().includes(searchQuery) ||
+    team.drivers.some(d => d.toLowerCase().includes(searchQuery))
+  );
+
+  const filteredDrivers = drivers.filter((driver) =>
+    driver.name.toLowerCase().includes(searchQuery) ||
+    driver.team.toLowerCase().includes(searchQuery)
+  );
+
+  const filteredCars = cars.filter((car) =>
+    car.model.toLowerCase().includes(searchQuery)
+  );
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <Hero onSearch={handleSearch} />
+
+      <main className="container mx-auto px-4 py-12 space-y-16">
+        {/* Rules Section */}
+        <section id="rules" className="animate-fadeIn">
+          <h2 className="text-3xl font-bold mb-6 text-foreground text-shadow">F1 Rules (2025)</h2>
+          <Card className="p-8 bg-card border-primary/50 shadow-[var(--card-shadow)]">
+            <ul className="space-y-3 mb-6">
+              {rules.map((rule, index) => (
+                <li key={index} className="flex items-start gap-2 text-muted-foreground">
+                  <span className="text-primary font-bold">•</span>
+                  <span>{rule}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="border-t border-border pt-6 space-y-3">
+              <h3 className="text-xl font-semibold mb-4 text-primary">Official Regulations & Updates</h3>
+              <a
+                href="https://www.fia.com/regulation/category/110"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-lg"
+              >
+                <ExternalLink className="h-5 w-5" />
+                Full FIA Sporting & Technical Regulations
+              </a>
+              <a
+                href="https://www.formula1.com/en/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-lg"
+              >
+                <ExternalLink className="h-5 w-5" />
+                Formula 1 Official News & Rule Updates
+              </a>
+            </div>
+          </Card>
+        </section>
+
+        {/* Teams Section */}
+        <section id="teams" className="animate-fadeIn">
+          <h2 className="text-3xl font-bold mb-6 text-foreground text-shadow">F1 Teams (2025)</h2>
+          {filteredTeams.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredTeams.map((team) => (
+                <TeamCard
+                  key={team.id}
+                  name={team.name}
+                  link={team.link}
+                  drivers={team.drivers}
+                  car={team.car}
+                  engine={team.engine}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No teams found matching your search.</p>
+          )}
+        </section>
+
+        {/* Drivers Section */}
+        <section id="drivers" className="animate-fadeIn">
+          <h2 className="text-3xl font-bold mb-6 text-foreground text-shadow">Star Drivers in 2025</h2>
+          {filteredDrivers.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredDrivers.map((driver) => (
+                <DriverCard key={driver.id} name={driver.name} link={driver.link} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No drivers found matching your search.</p>
+          )}
+        </section>
+
+        {/* Cars Section */}
+        <section id="cars" className="animate-fadeIn">
+          <h2 className="text-3xl font-bold mb-6 text-foreground text-shadow">2025 Cars & Regulations</h2>
+          <Card className="p-6 bg-card border-primary/50 shadow-[var(--card-shadow)] mb-6">
+            <p className="text-muted-foreground">
+              The 2025 cars continue with the ground effect aero rules introduced in 2022.
+              Power units remain hybrid V6 turbo engines supplied by Ferrari, Mercedes, Red Bull Powertrains (Honda), and Renault.
+            </p>
+          </Card>
+          {filteredCars.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCars.map((car) => (
+                <CarCard key={car.id} model={car.model} link={car.link} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No cars found matching your search.</p>
+          )}
+        </section>
+
+        {/* Standings Section */}
+        <Standings />
+
+        {/* Schedule Section */}
+        <Schedule />
+
+        {/* Latest Race Results */}
+        <LatestRace />
+
+        {/* References Section */}
+        <section id="refs" className="animate-fadeIn">
+          <h2 className="text-3xl font-bold mb-6 text-foreground text-shadow">References</h2>
+          <Card className="p-8 bg-card border-primary/50 shadow-[var(--card-shadow)]">
+            <div className="space-y-4">
+              <a
+                href="https://www.formula1.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-lg"
+              >
+                <ExternalLink className="h-5 w-5" />
+                Formula 1 Official Website
+              </a>
+              <a
+                href="https://www.fia.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-lg"
+              >
+                <ExternalLink className="h-5 w-5" />
+                FIA Official Website
+              </a>
+              <a
+                href="https://ergast.com/mrd/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:underline text-lg"
+              >
+                <ExternalLink className="h-5 w-5" />
+                Ergast F1 API (Data Source)
+              </a>
+            </div>
+          </Card>
+        </section>
+      </main>
+
+      <footer className="border-t border-primary/50 bg-gradient-to-r from-primary via-background to-background py-8 mt-16">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          © 2025 Formula 1 Fan Site | Data referenced from official F1 & FIA sources
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default Index;
